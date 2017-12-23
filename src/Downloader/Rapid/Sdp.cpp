@@ -154,8 +154,9 @@ static size_t write_streamed_data(const void* tmp, size_t size, size_t nmemb,
 {
 	if (IDownloader::AbortDownloads())
 		return -1;
-	char buf[CURL_MAX_WRITE_SIZE];
-	memcpy(&buf, tmp, CURL_MAX_WRITE_SIZE);
+	const size_t buf_size = size*nmemb;
+	char buf[buf_size];
+	memcpy(buf, tmp, buf_size);
 	if (!sdp->downloadInitialized) {
 		sdp->list_it = sdp->files.begin();
 		sdp->downloadInitialized = true;
@@ -163,8 +164,8 @@ static size_t write_streamed_data(const void* tmp, size_t size, size_t nmemb,
 		sdp->file_name = "";
 		sdp->skipped = 0;
 	}
-	char* buf_start = (char*)&buf;
-	const char* buf_end = buf_start + size * nmemb;
+	char* buf_start = buf;
+	const char* buf_end = buf_start + buf_size;
 	char* buf_pos = buf_start;
 
 	while (buf_pos < buf_end) {		// all bytes written?
